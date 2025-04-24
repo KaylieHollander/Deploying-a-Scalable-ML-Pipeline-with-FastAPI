@@ -26,21 +26,38 @@ class Data(BaseModel):
     hours_per_week: int = Field(..., example=40, alias="hours-per-week")
     native_country: str = Field(..., example="United-States", alias="native-country")
 
-path = None # TODO: enter the path for the saved encoder 
-encoder = load_model(path)
+project_path = "/Users/kayliehollander/Desktop/D501-Pt-2"
 
-path = None # TODO: enter the path for the saved model 
-model = load_model(path)
+path_encoder = os.path.join(project_path, "model", "encoder.pkl") # TODO: enter the path for the saved encoder 
+encoder_global = load_model(path_encoder)
+
+path_model = os.path.join(project_path, "model", "model.pkl") # TODO: enter the path for the saved model 
+model = load_model(path_model)
 
 # TODO: create a RESTful API using FastAPI
-app = None # your code here
+app = FastAPI() # your code here
 
 # TODO: create a GET on the root giving a welcome message
 @app.get("/")
 async def get_root():
     """ Say hello!"""
-    # your code here
-    pass
+    return {"message": "Hello"}
+
+class data(BaseModel):
+    age: int
+    workclass: str
+    fnlgt: int
+    education: str
+    education_num: int
+    marital_status: str
+    occupation: str
+    relationship: str
+    race: str
+    sex: str
+    capital_gain: int
+    capital_loss: int
+    hours_per_week: int
+    native_country: str
 
 
 # TODO: create a POST on a different path that does model inference
@@ -65,10 +82,11 @@ async def post_inference(data: Data):
         "native-country",
     ]
     data_processed, _, _, _ = process_data(
-        # your code here
-        # use data as data input
-        # use training = False
-        # do not need to pass lb as input
+        data,  
+        cat_features,
+        label = None, 
+        encoder = encoder_global,
+        training = False 
     )
-    _inference = None # your code here to predict the result using data_processed
+    _inference = model.predict(data_processed) # your code here to predict the result using data_processed
     return {"result": apply_label(_inference)}
